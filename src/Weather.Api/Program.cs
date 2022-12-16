@@ -22,10 +22,14 @@ try
             .Enrich.WithExceptionDetails()
             .WriteTo.Console();
     });
-    
+
     // Configure Open API
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+
+    // Compression/Caching
+    builder.Services.AddOutputCache();
+    
     builder.Services.AddEndpoints();
     
     var app = builder.Build();
@@ -39,6 +43,7 @@ try
         };
     });
     
+    app.UseOutputCache();
     
     if (app.Environment.IsDevelopment())
     {
