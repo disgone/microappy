@@ -1,5 +1,9 @@
 using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 using Serilog.Exceptions;
+
+using Weather.Api.Logging;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -10,7 +14,8 @@ try
     Log.Information("Starting up");
     
     var builder = WebApplication.CreateBuilder(args);
-    
+
+    builder.Services.AddSingleton<ILogEventFilter, ExcludeLogEventFilter>();
     // Logging
     builder.Host.UseSerilog((_, services, loggerConfig) =>
     {
@@ -54,11 +59,10 @@ try
     {
         app.UseSwagger();
         app.UseSwaggerUI();
+        app.Map("/", () => Results.Redirect("/swagger"));
     }
 
-    app.Map("/", () => Results.Redirect("/swagger"));
     app.UseEndpoints();
-
     app.Run();
 }
 catch (Exception ex)
