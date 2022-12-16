@@ -32,6 +32,9 @@ try
     
     builder.Services.AddEndpoints();
     
+    // OpenTelemetry
+    builder.AddOpenTelemetry();
+    
     var app = builder.Build();
 
     app.UseSerilogRequestLogging(opt =>
@@ -45,6 +48,8 @@ try
     
     app.UseOutputCache();
     
+    app.MapPrometheusScrapingEndpoint();
+
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();

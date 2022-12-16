@@ -1,7 +1,5 @@
 ﻿using System.Reflection;
-
 using Microsoft.Extensions.Logging.Abstractions;
-
 using Weather.Api;
 
 // ReSharper disable once CheckNamespace
