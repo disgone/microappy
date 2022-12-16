@@ -1,18 +1,18 @@
 namespace Weather.Api.Modules.Weather;
 
-internal static class WeatherEndpoints
+internal sealed class WeatherEndpointGroup : IEndpointGroup
 {
-    public static RouteGroupBuilder MapWeatherEndpoints(this WebApplication app)
+    public void AddRoutes(WebApplication app)
     {
         var group = app.MapGroup("/weather")
             .WithTags("weather");
-        
+
         group.MapGet("/", GetForecast)
-            .WithName("GetWeatherForecast");
-
-        return group;
+            .WithName("GetWeatherForecast")
+            .WithDescription("Gets the 5 day forecast")
+            .CacheOutput();
     }
-
+    
     private static WeatherForecast[] GetForecast(HttpContext context)
     {
         return Enumerable.Range(1, 5)

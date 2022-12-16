@@ -1,7 +1,5 @@
 using Serilog;
 
-using Weather.Api.Modules.Weather;
-
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
@@ -19,6 +17,7 @@ try
     // Configure Open API
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+    builder.Services.AddEndpoints();
     
     var app = builder.Build();
     
@@ -29,9 +28,8 @@ try
     }
 
     app.Map("/", () => Results.Redirect("/swagger"));
-    
-    app.MapWeatherEndpoints();
-    
+    app.UseEndpoints();
+
     app.Run();
 }
 catch (Exception ex)
