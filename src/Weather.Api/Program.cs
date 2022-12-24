@@ -1,8 +1,6 @@
 using Serilog;
 using Serilog.Core;
-using Serilog.Events;
 using Serilog.Exceptions;
-
 using Weather.Api.Logging;
 
 Log.Logger = new LoggerConfiguration()
@@ -12,8 +10,8 @@ Log.Logger = new LoggerConfiguration()
 try
 {
     Log.Information("Starting up");
-    
-    var builder = WebApplication.CreateBuilder(args);
+
+    WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
     builder.Services.AddSingleton<ILogEventFilter, ExcludeLogEventFilter>();
     // Logging
@@ -34,13 +32,13 @@ try
 
     // Compression/Caching
     builder.Services.AddOutputCache();
-    
+
     builder.Services.AddEndpoints();
-    
+
     // OpenTelemetry
     builder.AddOpenTelemetry();
-    
-    var app = builder.Build();
+
+    WebApplication app = builder.Build();
 
     app.UseSerilogRequestLogging(opt =>
     {
@@ -50,9 +48,9 @@ try
             dc.Set("RequestScheme", http.Request.Scheme);
         };
     });
-    
+
     app.UseOutputCache();
-    
+
     app.MapPrometheusScrapingEndpoint();
 
     if (app.Environment.IsDevelopment())

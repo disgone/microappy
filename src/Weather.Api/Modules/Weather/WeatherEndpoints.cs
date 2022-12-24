@@ -2,9 +2,14 @@ namespace Weather.Api.Modules.Weather;
 
 internal sealed class WeatherEndpointGroup : IEndpointGroup
 {
+    private static readonly string[] Summaries =
+    {
+        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+    };
+
     public void AddRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/weather")
+        RouteGroupBuilder group = app.MapGroup("/weather")
             .WithTags("weather");
 
         group.MapGet("/", GetForecast)
@@ -12,10 +17,9 @@ internal sealed class WeatherEndpointGroup : IEndpointGroup
             .WithDescription("Gets the 5 day forecast")
             .CacheOutput();
     }
-    
-    private static WeatherForecast[] GetForecast(HttpContext context)
-    {
-        return Enumerable.Range(1, 5)
+
+    private static WeatherForecast[] GetForecast(HttpContext context) =>
+        Enumerable.Range(1, 5)
             .Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
@@ -23,9 +27,4 @@ internal sealed class WeatherEndpointGroup : IEndpointGroup
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
-    }
-    
-    private static readonly string[] Summaries = {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
 }

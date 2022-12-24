@@ -7,25 +7,26 @@ namespace Microsoft.AspNetCore.Builder;
 
 public static class EndpointGroupExtensions
 {
-    public static void AddEndpoints(this IServiceCollection services)
-        => AddEndpoints(services, Assembly.GetCallingAssembly());
-    
+    public static void AddEndpoints(this IServiceCollection services) =>
+        AddEndpoints(services, Assembly.GetCallingAssembly());
+
     public static void AddEndpoints(this IServiceCollection services, params Assembly[] assemblies)
     {
-        var endpoints = new List<IEndpointGroup>();
+        List<IEndpointGroup> endpoints = new();
 
-        foreach (var assembly in assemblies)
+        foreach (Assembly assembly in assemblies)
         {
             endpoints.AddRange(
                 assembly.GetTypes()
-                    .Where(x => typeof(IEndpointGroup).IsAssignableFrom(x) && x is { IsInterface: false, IsAbstract: false })
+                    .Where(x => typeof(IEndpointGroup).IsAssignableFrom(x) &&
+                                x is { IsInterface: false, IsAbstract: false })
                     .Select(Activator.CreateInstance)
                     .Cast<IEndpointGroup>()
                     .ToList()
             );
         }
-        
-        foreach (var endpoint in endpoints)
+
+        foreach (IEndpointGroup endpoint in endpoints)
         {
             endpoint.RegisterServices(services);
         }
@@ -35,16 +36,16 @@ public static class EndpointGroupExtensions
 
     public static void UseEndpoints(this WebApplication app)
     {
-        var logger = app.Services.GetService<ILogger<Program>>() ?? NullLogger<Program>.Instance;
+        ILogger<Program> logger = app.Services.GetService<ILogger<Program>>() ?? NullLogger<Program>.Instance;
         logger.LogDebug("Registering route groups");
-        
-        var endpoints = app.Services.GetService<IReadOnlyCollection<IEndpointGroup>>()
-                        ?? Array.Empty<IEndpointGroup>();
 
-        foreach (var endpoint in endpoints)
+        IReadOnlyCollection<IEndpointGroup> endpoints = app.Services.GetService<IReadOnlyCollection<IEndpointGroup>>()
+                                                        ?? Array.Empty<IEndpointGroup>();
+
+        foreach (IEndpointGroup endpoint in endpoints)
         {
-            var type = endpoint.GetType();
-            logger.LogDebug("Registering routes from {type}", type);
+            Type type = endpoint.GetType();
+            logger.LogDebug("Registering routes from {Type}", type);
             endpoint.AddRoutes(app);
         }
     }

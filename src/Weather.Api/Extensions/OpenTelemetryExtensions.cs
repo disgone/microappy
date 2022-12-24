@@ -9,7 +9,7 @@ public static class OpenTelemetryExtensions
 {
     public static WebApplicationBuilder AddOpenTelemetry(this WebApplicationBuilder builder)
     {
-        var resources = ResourceBuilder.CreateDefault().AddService(builder.Environment.ApplicationName);
+        ResourceBuilder resources = ResourceBuilder.CreateDefault().AddService(builder.Environment.ApplicationName);
 
         builder.Services.AddOpenTelemetryMetrics(metrics =>
         {
